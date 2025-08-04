@@ -1,5 +1,39 @@
 // Smooth scrolling for navigation links
 document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu functionality
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+
+    // Toggle mobile menu
+    mobileNavToggle.addEventListener('click', function() {
+        mobileMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close mobile menu
+    mobileMenuClose.addEventListener('click', function() {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+
+    // Close mobile menu when clicking on a link
+    mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    });
+
+    // Close mobile menu when clicking outside
+    mobileMenu.addEventListener('click', function(e) {
+        if (e.target === mobileMenu) {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
     // Add smooth scrolling to all links
     const links = document.querySelectorAll('a[href^="#"]');
     
@@ -16,17 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-    });
-
-    // Add scroll effect to header
-    const header = document.querySelector('.header');
-    
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 100) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
     });
 
     // Initialize the page
@@ -68,15 +91,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Business Journey Animation
+    // Business Journey Scroll-Based Animation with Scroll Lock
     function initJourneyAnimation() {
         const steps = document.querySelectorAll('.timeline-step');
         const progressFill = document.getElementById('journeyProgress');
-        let currentStep = 0;
-        const stepDuration = 2000; // 2 seconds per step
+        const journeySection = document.querySelector('.business-journey-section');
+        let currentStep = -1; // Start from -1 so first activation becomes step 0
+        let journeyCompleted = false;
+        let isScrollLocked = false;
+        let scrollAccumulator = 0;
+        const scrollThreshold = 100; // Amount of scroll needed to advance to next step
 
         function animateStep(stepIndex) {
-            if (stepIndex < steps.length) {
+            if (stepIndex < steps.length && stepIndex !== currentStep && stepIndex >= 0) {
+                console.log(`Animating step from ${currentStep} to ${stepIndex}`);
+                
                 // Remove active class from all steps
                 steps.forEach(step => step.classList.remove('active'));
                 
@@ -88,52 +117,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 progressFill.style.width = progressPercent + '%';
                 
                 currentStep = stepIndex;
+                
+                // Check if journey is completed
+                if (stepIndex === steps.length - 1) {
+                    console.log('Journey completed!');
+                    journeyCompleted = true;
+                    setTimeout(() => {
+                        isScrollLocked = false;
+                        console.log('Scroll unlocked');
+                    }, 500); // Small delay before unlocking scroll
+                }
             }
         }
 
-        function startJourneyAnimation() {
-            let stepIndex = 0;
+        function handleJourneyScroll(event) {
+            if (!journeySection) return;
             
-            // Initial animation
-            animateStep(stepIndex);
+            const rect = journeySection.getBoundingClientRect();
             
-            // Set interval for automatic progression
-            const interval = setInterval(() => {
-                stepIndex++;
-                if (stepIndex >= steps.length) {
-                    stepIndex = 0; // Reset to beginning
+            // Check if we're in the journey section
+            if (rect.top <= 100 && rect.bottom >= window.innerHeight - 100) {
+                if (!journeyCompleted) {
+                    event.preventDefault();
+                    isScrollLocked = true;
+                    
+                    // Accumulate scroll delta
+                    scrollAccumulator += Math.abs(event.deltaY);
+                    
+                    // Check if we've scrolled enough to advance to next step
+                    if (scrollAccumulator >= scrollThreshold && currentStep < steps.length - 1) {
+                        const nextStep = currentStep + 1; // Simply increment by 1
+                        animateStep(nextStep);
+                        scrollAccumulator = 0; // Reset accumulator
+                    }
                 }
-                animateStep(stepIndex);
-            }, stepDuration);
-
-            // Pause animation on hover
-            const journeySection = document.querySelector('.business-journey-section');
-            journeySection.addEventListener('mouseenter', () => {
-                clearInterval(interval);
-            });
-
-            journeySection.addEventListener('mouseleave', () => {
-                // Restart animation after mouse leaves
-                setTimeout(() => {
-                    startJourneyAnimation();
-                }, 500);
-            });
+            } else {
+                // Reset when leaving the section
+                if (rect.bottom < window.innerHeight - 100) {
+                    journeyCompleted = false;
+                    currentStep = -1; // Start from -1 so first step becomes 0
+                    scrollAccumulator = 0;
+                    // Remove active class from all steps when leaving
+                    steps.forEach(step => step.classList.remove('active'));
+                    if (progressFill) progressFill.style.width = '0%';
+                }
+            }
         }
 
-        // Start animation when section is visible
-        const journeySection = document.querySelector('.business-journey-section');
-        const journeyObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    startJourneyAnimation();
-                    journeyObserver.unobserve(entry.target);
+        function updateJourneyOnScroll() {
+            if (!journeySection) return;
+            
+            const rect = journeySection.getBoundingClientRect();
+            
+            // Initialize first step when section comes into view
+            if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+                if (currentStep === -1) {
+                    animateStep(0); // Activate first step
                 }
-            });
-        }, { threshold: 0.3 });
-
-        if (journeySection) {
-            journeyObserver.observe(journeySection);
+            }
         }
+
+        // Add wheel event listener for scroll locking
+        window.addEventListener('wheel', handleJourneyScroll, { passive: false });
+        
+        // Add regular scroll listener for section detection
+        window.addEventListener('scroll', updateJourneyOnScroll);
+        
+        // Initial update
+        updateJourneyOnScroll();
 
         // Click handlers for manual step navigation
         steps.forEach((step, index) => {
@@ -141,10 +192,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 animateStep(index);
             });
         });
+
+        // Keyboard navigation (optional)
+        window.addEventListener('keydown', (event) => {
+            if (isScrollLocked) {
+                if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    const nextStep = Math.min(currentStep + 1, steps.length - 1);
+                    animateStep(nextStep);
+                    scrollAccumulator = 0;
+                } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    const prevStep = Math.max(currentStep - 1, 0);
+                    animateStep(prevStep);
+                    scrollAccumulator = 0;
+                }
+            }
+        });
     }
 
     // Initialize journey animation
     initJourneyAnimation();
+    
+    // Mobile Journey Step Highlighting
+    function initMobileJourneyHighlighting() {
+        // Only run on mobile devices
+        if (window.innerWidth <= 768) {
+            const steps = document.querySelectorAll('.timeline-step');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Remove mobile-active class from all steps
+                        steps.forEach(step => step.classList.remove('mobile-active'));
+                        
+                        // Add mobile-active class to the step in view
+                        entry.target.classList.add('mobile-active');
+                    }
+                });
+            }, {
+                threshold: 0.6, // Trigger when 60% of the step is visible
+                rootMargin: '-20% 0px -20% 0px' // Trigger when step is centered
+            });
+            
+            steps.forEach(step => {
+                observer.observe(step);
+            });
+        }
+    }
+    
+    // Initialize mobile highlighting
+    initMobileJourneyHighlighting();
+    
+    // Re-initialize on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+            initMobileJourneyHighlighting();
+        }
+    });
 
     // Scroll to contact function
     window.scrollToContact = function() {
@@ -195,12 +300,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Add CSS for scroll animations
-const style = document.createElement('style');
-style.textContent = `
-    .header.scrolled {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-    }
-`;
-document.head.appendChild(style);
+// End of script
