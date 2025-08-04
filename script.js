@@ -29,25 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add animation on scroll for sections
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-            }
-        });
-    }, observerOptions);
-
-    // Observe all sections
-    const sections = document.querySelectorAll('.hero, .guidance-section, .solutions-section, .testimonial-section');
-    sections.forEach(section => {
-        observer.observe(section);
-    });
+    // Initialize the page
+    console.log('AQ Accounting website loaded successfully');
 
     // Button hover effects
     const buttons = document.querySelectorAll('.cta-button');
@@ -218,17 +201,6 @@ style.textContent = `
     .header.scrolled {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
-    }
-    
-    .hero, .guidance-section, .solutions-section, .testimonial-section {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.6s ease;
-    }
-    
-    .animate-in {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
     }
 `;
 document.head.appendChild(style);
