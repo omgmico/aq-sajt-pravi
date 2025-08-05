@@ -1,6 +1,59 @@
-# Bullish Site - Business Consulting Website
+# AQ Accounting Website
 
-A professional business consulting website identical to the original "Bullish Site" but without newsletter functionality and popups.
+A professional business consulting website with modern design and responsive layout.
+
+## Project Structure
+
+```
+AQ Projekat/
+├── public/                 # Public assets and main HTML
+│   ├── index.html         # Main homepage
+│   └── images/            # Image assets
+├── src/                   # Source code
+│   ├── css/               # Stylesheets
+│   │   └── styles.css     # Main CSS file
+│   ├── js/                # JavaScript files
+│   │   └── script.js      # Main JavaScript functionality
+│   └── pages/             # Additional HTML pages
+│       ├── about-us.html  # About us page
+│       └── service-listing.html # Services page
+├── __tests__/             # Jest test files
+├── node_modules/          # npm dependencies
+├── package.json           # Project configuration
+├── jest.config.json       # Jest test configuration
+└── README.md             # This file
+```
+
+## Getting Started
+
+### Prerequisites
+- Node.js (for running tests)
+- Python (for local development server)
+
+### Installation
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+1. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   Or manually:
+   ```bash
+   cd public
+   python -m http.server 8080
+   ```
+
+2. Open your browser and navigate to `http://localhost:8080`
+
+### Testing
+Run tests with:
+```bash
+npm test
+```
 
 ## Features
 

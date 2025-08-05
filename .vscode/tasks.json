@@ -16,7 +16,7 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"options": {
-				"cwd": "${workspaceFolder}"
+				"cwd": "${workspaceFolder}/public"
 			}
 		},
 		{
