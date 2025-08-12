@@ -8,7 +8,6 @@
     position: sticky;
     top: 0;
     border-radius: 0 0 var(--section-radius) var(--section-radius);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1);
     min-height: 100vh;
     margin-top: -10vh; /* Suptilan overlap od 10% */
     z-index: 1;
@@ -37,7 +36,6 @@
     background: inherit;
     border-radius: var(--section-radius) var(--section-radius) 0 0;
     z-index: -1;
-    box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
 }
 
 /* First section gets special treatment */
@@ -53,30 +51,15 @@
     from {
         transform: translateY(10vh) scale(0.98);
         opacity: 0.9;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
     to {
         transform: translateY(0) scale(1);
         opacity: 1;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1);
     }
 }
 
 .stack-section {
     animation: slideInFromBelow 0.6s ease-out forwards;
-}
-
-/* Enhanced shadows for different section types */
-.hero.stack-section {
-    box-shadow: 0 12px 40px rgba(15, 116, 188, 0.2), 0 6px 12px rgba(0,0,0,0.1);
-}
-
-.stats-section.stack-section {
-    box-shadow: 0 12px 40px rgba(15, 116, 188, 0.3), 0 6px 12px rgba(0,0,0,0.15);
-}
-
-.testimonial-section.stack-section {
-    box-shadow: 0 12px 40px rgba(35, 38, 41, 0.4), 0 6px 12px rgba(0,0,0,0.2);
 }
 
 html {
