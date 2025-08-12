@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0F74BC">
     <title>AQ Accounting - Knjigovodstvo i Biznis Konsalting</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -356,7 +357,7 @@
                             <div class="contact-icon">📞</div>
                             <div>
                                 <strong>Telefon</strong>
-                                <p>+382 XX XXX XXX</p>
+                                <p><a href="tel:+382XXXXXXXX" aria-label="Pozovi AQ Accounting">+382 XX XXX XXX</a></p>
                             </div>
                         </div>
                         
@@ -364,7 +365,7 @@
                             <div class="contact-icon">✉️</div>
                             <div>
                                 <strong>Email</strong>
-                                <p>info@aqaccounting.me</p>
+                                <p><a href="mailto:info@aqaccounting.me">info@aqaccounting.me</a></p>
                             </div>
                         </div>
                         
@@ -383,15 +384,15 @@
                         <h3>Pošaljite Upit</h3>
                         
                         <div class="form-group">
-                            <input type="text" id="name" name="name" placeholder="Vaše Ime*" required>
+                            <input type="text" id="name" name="name" placeholder="Vaše Ime*" required autocomplete="name">
                         </div>
                         
                         <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="Email Adresa*" required>
+                            <input type="email" id="email" name="email" placeholder="Email Adresa*" required autocomplete="email" inputmode="email">
                         </div>
                         
                         <div class="form-group">
-                            <input type="tel" id="phone" name="phone" placeholder="Broj Telefona">
+                            <input type="tel" id="phone" name="phone" placeholder="Broj Telefona" autocomplete="tel" inputmode="tel">
                         </div>
                         
                         <div class="form-group">
@@ -408,7 +409,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <textarea id="message" name="message" placeholder="Opišite Vaše Potrebe" rows="4"></textarea>
+                            <textarea id="message" name="message" placeholder="Opišite Vaše Potrebe" rows="4" autocomplete="off"></textarea>
                         </div>
                         
                         <button type="submit" class="submit-button">Pošaljite Upit</button>

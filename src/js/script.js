@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!isExpanded) {
             mobileMenu.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('no-scroll');
             mobileNavToggle.setAttribute('aria-expanded', 'true');
             
             // Focus first menu item for keyboard navigation
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             mobileMenu.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('no-scroll');
             mobileNavToggle.setAttribute('aria-expanded', 'false');
             mobileNavToggle.focus();
         }
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close mobile menu
     mobileMenuClose.addEventListener('click', function() {
         mobileMenu.classList.remove('active');
-        document.body.style.overflow = 'auto';
+    document.body.classList.remove('no-scroll');
         mobileNavToggle.setAttribute('aria-expanded', 'false');
         mobileNavToggle.focus();
     });
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileMenuLinks.forEach(link => {
         link.addEventListener('click', function() {
             mobileMenu.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('no-scroll');
             mobileNavToggle.setAttribute('aria-expanded', 'false');
         });
     });
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileMenu.addEventListener('click', function(e) {
         if (e.target === mobileMenu) {
             mobileMenu.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('no-scroll');
             mobileNavToggle.setAttribute('aria-expanded', 'false');
             mobileNavToggle.focus();
         }
@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Parallax stacking effect for sections
     function initParallaxStacking() {
+        // Disable on small screens or reduced motion
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (window.innerWidth <= 768 || prefersReduced) return;
         const stackSections = document.querySelectorAll('.stack-section:not(.first)'); // Exclude first section
         
         const observerOptions = {
@@ -88,10 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     section.style.transform = transform;
                     section.style.opacity = opacity;
                     
-                    // Dodaj glow efekat
-                    if (ratio > 0.8) {
-                        section.style.boxShadow = `0 ${12 + ratio * 8}px ${40 + ratio * 10}px rgba(0,0,0,${0.15 + ratio * 0.1}), 0 6px 12px rgba(0,0,0,0.1)`;
-                    }
+                    // bez dodatnih senki na mobilnom
                 } else {
                     // Reset transformacije kada sekcija nije vidljiva
                     section.style.transform = '';
@@ -168,6 +168,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Business Journey Scroll-Based Animation with Scroll Lock
     function initJourneyAnimation() {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isMobile = window.innerWidth <= 768;
+        // On mobile or reduced motion, replace scroll lock with simple highlight behavior
+        if (isMobile || prefersReduced) {
+            // Simple active state on intersection (mobile already handled below)
+            return; // Skip heavy scroll-lock logic entirely
+        }
         const steps = document.querySelectorAll('.timeline-step');
         const progressFill = document.getElementById('journeyProgress');
         const journeySection = document.querySelector('.business-journey-section');
