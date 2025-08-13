@@ -212,11 +212,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     journeyCompleted = true;
                     journeyPermanentlyCompleted = true; // PERMANENT completion
                     
-                    // Delay unlock by 0.5s before disabling all future interactions
+                    // Delay unlock by 5s before disabling all future interactions
                     setTimeout(() => {
                         isScrollLocked = false;
-                        console.log('Scroll unlocked after 0.5s delay - journey permanently done');
-                    }, 500);
+                        console.log('Scroll unlocked after 1s delay - journey permanently done');
+                    }, 1000);
                     
                     // Keep step 5 active and progress bar full FOREVER
                     steps[stepIndex].classList.add('active');
@@ -240,11 +240,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const rect = journeySection.getBoundingClientRect();
             const currentTime = Date.now();
             
-            // Check if we're in the journey section
-            if (rect.top <= 100 && rect.bottom >= window.innerHeight - 100) {
-                // If permanently completed, don't process any more scrolls
+            // Check if we're in the journey section - start scroll lock later to allow seeing animation bar
+            if (rect.top <= -110 && rect.bottom >= window.innerHeight - 100) {
+                // If permanently completed but still in delay period, block scrolling
+                if (journeyPermanentlyCompleted && isScrollLocked) {
+                    event.preventDefault();
+                    return; // Block scroll during delay period
+                }
+                
+                // If permanently completed and delay passed, allow normal scrolling
                 if (journeyPermanentlyCompleted) {
                     return; // Journey is done forever, ignore all scrolls
+                }
+                
+                // NEW: Allow scroll up if user is scrolling up (negative deltaY)
+                if (event.deltaY < 0) {
+                    // Allow upward scroll without preventing default
+                    return;
                 }
                 
                 if (!journeyCompleted) {
@@ -394,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Only run on mobile devices
         if (window.innerWidth <= 768) {
             const steps = document.querySelectorAll('.timeline-step');
+            const progressFill = document.getElementById('journeyProgress');
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -403,6 +416,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Add mobile-active class to the step in view
                         entry.target.classList.add('mobile-active');
+                        
+                        // Update progress bar based on which step is active
+                        const stepIndex = Array.from(steps).indexOf(entry.target);
+                        if (stepIndex !== -1 && progressFill) {
+                            const progressPercent = ((stepIndex + 1) / steps.length) * 100;
+                            progressFill.style.width = progressPercent + '%';
+                        }
                     }
                 });
             }, {
@@ -420,10 +440,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileJourneyHighlighting();
     
     // Re-initialize on window resize
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        if (window.innerWidth <= 768) {
-            initMobileJourneyHighlighting();
-        }
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (window.innerWidth <= 768) {
+                initMobileJourneyHighlighting();
+            }
+        }, 250); // Debounce resize events
     });
 
     // Scroll to contact function
